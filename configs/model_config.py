@@ -22,13 +22,15 @@ embedding_model_dict = {
     "text2vec-base-chinese-paraphrase": "shibing624/text2vec-base-chinese-paraphrase",
     "m3e-small": "moka-ai/m3e-small",
     "m3e-base": "moka-ai/m3e-base",
+    "all-MiniLM-L6-v2": "/data/yuanrz/model/all-MiniLM-L6-v2",
 }
 
 # Embedding model name
-EMBEDDING_MODEL = "text2vec"
+# EMBEDDING_MODEL = "text2vec"
+EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 # Embedding running device
-EMBEDDING_DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+EMBEDDING_DEVICE = "cuda:3" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 # supported LLM models
 # llm_model_dict 处理了loader的一些预设行为，如加载位置，模型名称，模型处理器实例
@@ -72,13 +74,13 @@ llm_model_dict = {
     "chatglm2-6b": {
         "name": "chatglm2-6b",
         "pretrained_model_name": "THUDM/chatglm2-6b",
-        "local_model_path": None,
+        "local_model_path": "/data/yuanrz/model/chatglm2-6b",
         "provides": "ChatGLMLLMChain"
     },
     "chatglm2-6b-32k": {
         "name": "chatglm2-6b-32k",
         "pretrained_model_name": "THUDM/chatglm2-6b-32k",
-        "local_model_path": None,
+        "local_model_path": '/data/yuanrz/model/chatglm2-6b-32k',
         "provides": "ChatGLMLLMChain"
     },
     # 注：chatglm2-cpp已在mac上测试通过，其他系统暂不支持
@@ -229,6 +231,7 @@ llm_model_dict = {
 
 # LLM 名称
 LLM_MODEL = "chatglm2-6b-32k"
+# LLM_MODEL = "chatglm2-6b"
 # 量化加载8bit 模型
 LOAD_IN_8BIT = False
 # Load the model with bfloat16 precision. Requires NVIDIA Ampere GPU.
@@ -248,7 +251,7 @@ STREAMING = True
 USE_PTUNING_V2 = False
 PTUNING_DIR='./ptuning-v2'
 # LLM running device
-LLM_DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+LLM_DEVICE = "cuda:3" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 # 知识库默认存储路径
 KB_ROOT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "knowledge_base")

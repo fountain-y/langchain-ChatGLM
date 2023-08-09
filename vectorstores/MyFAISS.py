@@ -42,7 +42,10 @@ class MyFAISS(FAISS, VectorStore):
         return lists
 
     def similarity_search_with_score_by_vector(
-            self, embedding: List[float], k: int = 4
+            self, embedding: List[float], k: int = 4,
+            filter = None,
+            fetch_k: int = 20,
+            **kwargs: Any,
     ) -> List[Document]:
         faiss = dependable_faiss_import()
         vector = np.array([embedding], dtype=np.float32)
