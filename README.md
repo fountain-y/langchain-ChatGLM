@@ -1,5 +1,13 @@
 # 基于本地知识库的 ChatGLM 等大语言模型应用实现
 
+## Easy to start
+1. 在`knowledge_base`目录下新建文件夹`{knowledge_id}`，目前只支持英文目录，作为数据集
+2. 在`knowledge_base/{knowledge_id}/content`目录下存放数据库对应的txt文件
+3. 运行`python kbinit.py`，会对`knowledge_base/{knowledge_id}`数据库信息进行初始化，建立索引
+4. 运行`python webui.py`，启动服务，可通过浏览器访问
+5. 在`模型`栏目中，选择`知识库问答`模式，选择`knowledge_id`，即可进行问答
+6. 更多参数设置请参照`configs/model_config.py`文件
+
 ## 介绍
 
 🌍 [_READ THIS IN ENGLISH_](README_en.md)

@@ -101,7 +101,7 @@ if __name__ == '__main__':
     for filename in tqdm(os.listdir(saved_path)):
         file_content = ''
         file_path = os.path.join(saved_path, filename)
-        if not os.path.isfile(file_path):
+        if not os.path.isfile(file_path) or not file_path.endswith(".txt"):
             continue
         with open(file_path, "r") as f:
             file_content = f.read()
