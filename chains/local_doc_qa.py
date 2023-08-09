@@ -18,7 +18,7 @@ from langchain.docstore.document import Document
 from functools import lru_cache
 from textsplitter.zh_title_enhance import zh_title_enhance
 from langchain.chains.base import Chain
-
+from langchain.text_splitter import RecursiveCharacterTextSplitter, TextSplitter
 
 # patch HuggingFaceEmbeddings to make it hashable
 def _embeddings_hash(self):
@@ -66,6 +66,10 @@ def load_file(filepath, sentence_size=SENTENCE_SIZE, using_zh_title_enhance=ZH_T
         loader = TextLoader(filepath, autodetect_encoding=True)
         textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
         docs = loader.load_and_split(textsplitter)
+    # elif filepath.lower().endswith(".txt"):
+    #     loader = TextLoader(filepath, autodetect_encoding=True)
+    #     textsplitter = RecursiveCharacterTextSplitter(chunk_size=sentence_size, chunk_overlap=int(sentence_size*0.5))
+    #     docs = loader.load_and_split(textsplitter)
     elif filepath.lower().endswith(".pdf"):
         # 暂且将paddle相关的loader改为动态加载，可以在不上传pdf/image知识文件的前提下使用protobuf=4.x
         from loader import UnstructuredPaddlePDFLoader
@@ -109,6 +113,7 @@ def generate_prompt(related_docs: List[str],
                     query: str,
                     prompt_template: str = PROMPT_TEMPLATE, ) -> str:
     context = "\n".join([doc.page_content for doc in related_docs])
+    print('docs count : {}'.format(len(related_docs)))
     prompt = prompt_template.replace("{question}", query).replace("{context}", context)
     return prompt
 
@@ -236,11 +241,14 @@ class LocalDocQA:
         vector_store.score_threshold = self.score_threshold
         related_docs_with_score = vector_store.similarity_search_with_score(query, k=self.top_k)
         torch_gc()
+        # import pdb;pdb.set_trace()
         if len(related_docs_with_score) > 0:
+            # according to PROMPT_TEMPLATE, append (query, context)
             prompt = generate_prompt(related_docs_with_score, query)
             print('query add docs', prompt)
         else:
             prompt = query
+            print('query only', prompt)
 
         answer_result_stream_result = self.llm_model_chain(
             {"prompt": prompt, "history": chat_history, "streaming": streaming})

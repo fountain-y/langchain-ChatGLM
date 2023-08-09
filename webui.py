@@ -105,6 +105,7 @@ def init_model():
     shared.loaderCheckPoint = LoaderCheckPoint(args_dict)
     llm_model_ins = shared.loaderLLM()
     llm_model_ins.history_len = LLM_HISTORY_LEN
+    # import pdb;pdb.set_trace()
     try:
         local_doc_qa.init_cfg(llm_model=llm_model_ins)
         answer_result_stream_result = local_doc_qa.llm_model_chain(

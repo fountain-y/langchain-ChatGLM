@@ -257,16 +257,21 @@ LLM_DEVICE = "cuda:3" if torch.cuda.is_available() else "mps" if torch.backends.
 KB_ROOT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "knowledge_base")
 
 # 基于上下文的prompt模版，请务必保留"{question}"和"{context}"
-PROMPT_TEMPLATE = """已知信息：
+# PROMPT_TEMPLATE = """已知信息：
+# {context} 
+
+# 根据上述已知信息，简洁和专业的来回答用户的问题。如果无法从中得到答案，请说 “根据已知信息无法回答该问题” 或 “没有提供足够的相关信息”，不允许在答案中添加编造成分，答案请使用中文。 问题是：{question}"""
+PROMPT_TEMPLATE = """已知材料信息：
 {context} 
 
-根据上述已知信息，简洁和专业的来回答用户的问题。如果无法从中得到答案，请说 “根据已知信息无法回答该问题” 或 “没有提供足够的相关信息”，不允许在答案中添加编造成分，答案请使用中文。 问题是：{question}"""
+根据上述已知信息，简洁和专业的来回答用户的问题。如果无法从中得到答案，请说 “根据已知信息无法回答该问题” 或 “没有提供足够的相关信息”，然后根据理解生成答案，答案请使用中文。 问题是：{question}"""
+
 
 # 缓存知识库数量,如果是ChatGLM2,ChatGLM2-int4,ChatGLM2-int8模型若检索效果不好可以调成’10’
-CACHED_VS_NUM = 1
+CACHED_VS_NUM = 10
 
 # 文本分句长度
-SENTENCE_SIZE = 100
+SENTENCE_SIZE = 500
 
 # 匹配后单段上下文长度
 CHUNK_SIZE = 250
@@ -275,9 +280,11 @@ CHUNK_SIZE = 250
 LLM_HISTORY_LEN = 3
 
 # 知识库检索时返回的匹配内容条数
-VECTOR_SEARCH_TOP_K = 5
+# VECTOR_SEARCH_TOP_K = 5
+VECTOR_SEARCH_TOP_K = 10
 
 # 知识检索内容相关度 Score, 数值范围约为0-1100，如果为0，则不生效，建议设置为500左右，经测试设置为小于500时，匹配结果更精准
+# VECTOR_SEARCH_SCORE_THRESHOLD = 1100
 VECTOR_SEARCH_SCORE_THRESHOLD = 500
 
 NLTK_DATA_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "nltk_data")
@@ -312,4 +319,5 @@ BING_SUBSCRIPTION_KEY = ""
 # 是否开启中文标题加强，以及标题增强的相关配置
 # 通过增加标题判断，判断哪些文本为标题，并在metadata中进行标记；
 # 然后将文本与往上一级的标题进行拼合，实现文本信息的增强。
-ZH_TITLE_ENHANCE = False
+# ZH_TITLE_ENHANCE = False
+ZH_TITLE_ENHANCE = True

@@ -23,6 +23,7 @@ from configs.model_config import (KB_ROOT_PATH, EMBEDDING_DEVICE,
 import models.shared as shared
 from models.loader.args import parser
 from models.loader import LoaderCheckPoint
+import shutil
 
 from tqdm import tqdm
 
@@ -74,7 +75,17 @@ def upload_files(
     file_status = f"documents {', '.join([os.path.split(i)[-1] for i in loaded_files])} upload fail"
     return BaseResponse(code=500, msg=file_status)
 
+def init_filepath(knowledgeid):
+    knowledge_path = get_kb_path(knowledgeid)
+    tmpfile_path = os.path.join(get_doc_path(knowledgeid), "tmp_files")
+    vector_store_path = os.path.join(knowledge_path, "vector_store")
+    
+    shutil.rmtree(tmpfile_path, ignore_errors=True)
+    shutil.rmtree(vector_store_path, ignore_errors=True)
+
 if __name__ == '__main__':
+    # change the knowledge_base_id to your own
+    # the path of the knowledge_base_id is knowledge_base/{knowledge_base_id}
     knowledge_base_id = "financial"
     
     if not validate_kb_name(knowledge_base_id):
@@ -84,6 +95,8 @@ if __name__ == '__main__':
     if not os.path.exists(saved_path):
         os.makedirs(saved_path)
     filelist = []
+    
+    init_filepath(knowledge_base_id)
     
     for filename in tqdm(os.listdir(saved_path)):
         file_content = ''
@@ -101,4 +114,4 @@ if __name__ == '__main__':
     localdocqa = LocalDocQA()
     localdocqa.init_cfg()
     vs_path, loaded_files = localdocqa.init_knowledge_vector_store(filepath=filelist, vs_path=vs_path)
-    print('finish!')
+    print('kn init finish!')

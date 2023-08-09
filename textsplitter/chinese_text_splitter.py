@@ -3,14 +3,14 @@ import re
 from typing import List
 from configs.model_config import SENTENCE_SIZE
 
-
+# need to be override the split_text method
 class ChineseTextSplitter(CharacterTextSplitter):
     def __init__(self, pdf: bool = False, sentence_size: int = SENTENCE_SIZE, **kwargs):
         super().__init__(**kwargs)
         self.pdf = pdf
         self.sentence_size = sentence_size
 
-    def split_text1(self, text: str) -> List[str]:
+    def split_text_(self, text: str) -> List[str]:
         if self.pdf:
             text = re.sub(r"\n{3,}", "\n", text)
             text = re.sub('\s', ' ', text)
@@ -24,6 +24,7 @@ class ChineseTextSplitter(CharacterTextSplitter):
                 sent_list.append(ele)
         return sent_list
 
+    # split text by sentence
     def split_text(self, text: str) -> List[str]:   ##此处需要进一步优化逻辑
         if self.pdf:
             text = re.sub(r"\n{3,}", r"\n", text)

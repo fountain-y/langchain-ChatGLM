@@ -52,6 +52,7 @@ class MyFAISS(FAISS, VectorStore):
         if self._normalize_L2:
             faiss.normalize_L2(vector)
         scores, indices = self.index.search(vector, k)
+        # import pdb;pdb.set_trace()
         docs = []
         id_set = set()
         store_len = len(self.index_to_docstore_id)
