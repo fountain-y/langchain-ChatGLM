@@ -24,6 +24,7 @@ import models.shared as shared
 from models.loader.args import parser
 from models.loader import LoaderCheckPoint
 import shutil
+import argparse
 
 from tqdm import tqdm
 
@@ -82,11 +83,18 @@ def init_filepath(knowledgeid):
     
     shutil.rmtree(tmpfile_path, ignore_errors=True)
     shutil.rmtree(vector_store_path, ignore_errors=True)
+    
+def arg_parser():
+    args = argparse.ArgumentParser()
+    args.add_argument("-k", "--knowledge_base_id", type=str, default="financial")
+    return args.parse_args()
 
 if __name__ == '__main__':
     # change the knowledge_base_id to your own
     # the path of the knowledge_base_id is knowledge_base/{knowledge_base_id}
-    knowledge_base_id = "financial"
+    args = arg_parser()
+    
+    knowledge_base_id = args.knowledge_base_id
     
     if not validate_kb_name(knowledge_base_id):
         assert False, "Invalid knowledge base name"
@@ -114,4 +122,4 @@ if __name__ == '__main__':
     localdocqa = LocalDocQA()
     localdocqa.init_cfg()
     vs_path, loaded_files = localdocqa.init_knowledge_vector_store(filepath=filelist, vs_path=vs_path)
-    print('kn init finish!')
+    print('kb init finish!')
