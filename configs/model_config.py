@@ -31,6 +31,7 @@ embedding_model_dict = {
 EMBEDDING_MODEL = "m3e-base"
 
 # Embedding running device
+# EMBEDDING_DEVICE = "cuda:3" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 EMBEDDING_DEVICE = "cuda:3" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 # supported LLM models
@@ -260,6 +261,7 @@ USE_PTUNING_V2 = False
 PTUNING_DIR='./ptuning-v2'
 # LLM running device
 LLM_DEVICE = "cuda:3" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+# LLM_DEVICE = "cuda:5" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 # 知识库默认存储路径
 KB_ROOT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "knowledge_base")
