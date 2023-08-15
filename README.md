@@ -8,6 +8,12 @@
 5. 在`模型`栏目中，选择`知识库问答`模式，选择`knowledge_id`，即可进行问答
 6. 更多参数设置请参照`configs/model_config.py`文件
 
+- Spacy分句模型
+  - ```
+    pip install spacy
+    python -m spacy download zh_core_web_lg
+    ```
+
 ## 介绍
 
 🌍 [_READ THIS IN ENGLISH_](README_en.md)

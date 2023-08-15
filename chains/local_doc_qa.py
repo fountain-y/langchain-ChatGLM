@@ -18,7 +18,7 @@ from langchain.docstore.document import Document
 from functools import lru_cache
 from textsplitter.zh_title_enhance import zh_title_enhance
 from langchain.chains.base import Chain
-from langchain.text_splitter import RecursiveCharacterTextSplitter, TextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter, TextSplitter, SpacyTextSplitter
 
 # patch HuggingFaceEmbeddings to make it hashable
 def _embeddings_hash(self):
@@ -62,14 +62,24 @@ def load_file(filepath, sentence_size=SENTENCE_SIZE, using_zh_title_enhance=ZH_T
     if filepath.lower().endswith(".md"):
         loader = UnstructuredFileLoader(filepath, mode="elements")
         docs = loader.load()
-    elif filepath.lower().endswith(".txt"):
-        loader = TextLoader(filepath, autodetect_encoding=True)
-        textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
-        docs = loader.load_and_split(textsplitter)
+        
+    # elif filepath.lower().endswith(".txt"):
+    #     print('split by ChineseTextSplitter')
+    #     loader = TextLoader(filepath, autodetect_encoding=True)
+    #     textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
+    #     docs = loader.load_and_split(textsplitter)
     # elif filepath.lower().endswith(".txt"):
     #     loader = TextLoader(filepath, autodetect_encoding=True)
     #     textsplitter = RecursiveCharacterTextSplitter(chunk_size=sentence_size, chunk_overlap=int(sentence_size*0.5))
     #     docs = loader.load_and_split(textsplitter)
+    
+    elif filepath.lower().endswith(".txt"):
+        print('split by SpacyTextSplitter')
+        loader = TextLoader(filepath, autodetect_encoding=True)
+        # textsplitter = SpacyTextSplitter(pipeline='zh_core_web_sm', chunk_size=sentence_size, chunk_overlap=int(sentence_size*0.5))
+        textsplitter = SpacyTextSplitter(pipeline='zh_core_web_lg', chunk_size=sentence_size, chunk_overlap=int(sentence_size*0.5))
+        docs = loader.load_and_split(textsplitter)
+    
     elif filepath.lower().endswith(".pdf"):
         # 暂且将paddle相关的loader改为动态加载，可以在不上传pdf/image知识文件的前提下使用protobuf=4.x
         from loader import UnstructuredPaddlePDFLoader

@@ -86,7 +86,7 @@ def init_filepath(knowledgeid):
     
 def arg_parser():
     args = argparse.ArgumentParser()
-    args.add_argument("-k", "--knowledge_base_id", type=str, default="financial")
+    args.add_argument("-k", "--knowledge_base_id", type=str, default="regulation")
     return args.parse_args()
 
 if __name__ == '__main__':

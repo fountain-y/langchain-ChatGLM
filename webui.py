@@ -11,6 +11,7 @@ import os
 
 nltk.data.path = [NLTK_DATA_PATH] + nltk.data.path
 
+os.environ["no_proxy"] = "localhost,127.0.0.1,::1"
 
 def get_vs_list():
     lst_default = ["新建知识库"]
