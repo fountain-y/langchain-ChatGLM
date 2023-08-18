@@ -32,7 +32,7 @@ EMBEDDING_MODEL = "m3e-base"
 
 # Embedding running device
 # EMBEDDING_DEVICE = "cuda:3" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-EMBEDDING_DEVICE = "cuda:3" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+EMBEDDING_DEVICE = "cuda:6" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 # supported LLM models
 # llm_model_dict 处理了loader的一些预设行为，如加载位置，模型名称，模型处理器实例
@@ -166,6 +166,12 @@ llm_model_dict = {
         "local_model_path": None,
         "provides": "MOSSLLMChain"
     },
+    "baichuan-13b": {
+        "name": "baichuan-13b",
+        "pretrained_model_name": "baichuan-inc/baichuan-13B",
+        "local_model_path": "/data/yuanrz/model/Baichuan-13B-Chat",
+        "provides": "MOSSLLMChain"
+    },
     # llama-cpp模型的兼容性问题参考https://github.com/abetlen/llama-cpp-python/issues/204
     "ggml-vicuna-13b-1.1-q5": {
         "name": "ggml-vicuna-13b-1.1-q5",
@@ -238,7 +244,8 @@ llm_model_dict = {
 }
 
 # LLM 名称
-LLM_MODEL = "chatglm2-6b-32k"
+# LLM_MODEL = "chatglm2-6b-32k"
+LLM_MODEL = "baichuan-13b"
 # LLM_MODEL = "Qwen-7B-Chat"
 # LLM_MODEL = "chatglm2-6b"
 # 量化加载8bit 模型
@@ -260,7 +267,7 @@ STREAMING = True
 USE_PTUNING_V2 = False
 PTUNING_DIR='./ptuning-v2'
 # LLM running device
-LLM_DEVICE = "cuda:3" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+LLM_DEVICE = "cuda:6" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 # LLM_DEVICE = "cuda:5" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 # 知识库默认存储路径
@@ -271,24 +278,57 @@ KB_ROOT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "knowled
 # {context} 
 
 # 根据上述已知信息，简洁和专业的来回答用户的问题。如果无法从中得到答案，请说 “根据已知信息无法回答该问题” 或 “没有提供足够的相关信息”，不允许在答案中添加编造成分，答案请使用中文。 问题是：{question}"""
-PROMPT_TEMPLATE = """已知材料信息：
-{context} 
+PROMPT_TEMPLATE = """
+接下来首先是一些相关示例，然后是您的问题和答案。请注意，示例中的答案可能不是正确的答案，但是它们可以帮助您更好地理解问题。请逐步思考问题，并且回答目标问题。
 
-根据上述已知信息，尽可能详细和专业的来回答用户的问题。如果能够检索到答案，需要保证回答完整，但不允许在答案中添加额外编造成分。如果无法从中得到答案，请说 “根据已知信息无法回答该问题，但根据理解，” 或 “没有提供足够的相关信息，但根据理解，”，然后根据理解生成答案，答案请使用中文。 问题是：{question}"""
+示例1：
+###已知信息：
+第六十三条 商业银行对视同我国主权的公共部门实体风险暴露的风险权重。 （一）对我国中央政府投资的金融资产管理公司为收购国有银行不良贷款而定向发行的债券的风险权重为0%。 （二）对省级（直辖市、自治区）及计划单列市人民政府风险暴露的风险权重根据债券类型确定。一般债券风险权重为10%，专项债券风险权重为20%。 （三）对除财政部和中国人民银行外，其他收入主要源于中央财政的公共部门风险暴露的风险权重为20%。 （四）对其他经国务院批准可视同我国主权的公共部门实体风险暴露的风险权重另行规定。 商业银行对前款所列视同我国主权的公共部门实体投资的工商企业的风险暴露不适用上述风险权重。 
+###问题是：对省级（直辖市、自治区）及计划单列市人民政府的风险暴露。
+###答：
+对省级（直辖市、自治区）及计划单列市人民政府风险暴露的风险权重根据债券类型确定。一般债券风险权重为10%，专项债券风险权重为20%。
+
+示例2：
+###已知信息：
+（一）对有短期评级、或未评级但有推测评级的风险暴露，可按表2确定风险权重。 表2 短期评级风险权重表 | 外部信用评级 | A–1/P–1 | A–2/P–2 | A–3/P–3 | 其他评级 | | ---- | ---- | ---- | ---- | ---- | | 风险权重 | 15% | 50% | 100% | 1250% | 如果符合“简单、透明、可比”标准，则按表3确定风险权重。 表3 符合“简单、透明、可比”标准的短期评级风险权重表 | 外部信用评级 | A–1/P–1 | A–2/P–2 | A–3/P–3 | 其他评级 | | ---- | ---- | ---- | ---- | ---- | | 风险权重 | 10% | 30% | 60% | 1250% |
+###问题是：符合“简单、透明、可比”标准的短期评级风险权重，以表格形式展现。
+###答：
+已知信息中，表3的表头：符合“简单、透明、可比”标准的短期评级风险权重表，与目标问题“符合“简单、透明、可比”标准的短期评级风险权重，以表格形式展现”符合，因此可以直接使用表3的表格形式展现。
+| 外部信用评级 | A–1/P–1 | A–2/P–2 | A–3/P–3 | 其他评级 |
+| ---- | ---- | ---- | ---- | ---- |
+| 风险权重 | 10% | 30% | 60% | 1250% |
+
+示例3：
+###已知信息：
+（一）对有短期评级、或未评级但有推测评级的风险暴露，可按表2确定风险权重。 表2 短期评级风险权重表 | 外部信用评级 | A–1/P–1 | A–2/P–2 | A–3/P–3 | 其他评级 | | ---- | ---- | ---- | ---- | ---- | | 风险权重 | 15% | 50% | 100% | 1250% | 如果符合“简单、透明、可比”标准，则按表3确定风险权重。 表3 符合“简单、透明、可比”标准的短期评级风险权重表 | 外部信用评级 | A–1/P–1 | A–2/P–2 | A–3/P–3 | 其他评级 | | ---- | ---- | ---- | ---- | ---- | | 风险权重 | 10% | 30% | 60% | 1250% |
+###问题是：短期评级风险权重，以表格形式展现。
+###答：
+已知信息中，表2的表头短期评级风险权重表，与目标问题“短期评级风险权重，以表格形式展现”符合，因此可以直接使用表2的表格形式展现。
+| 外部信用评级 | A–1/P–1 | A–2/P–2 | A–3/P–3 | 其他评级 |
+| ---- | ---- | ---- | ---- | ---- |
+| 风险权重 | 15% | 50% | 100% | 1250% |
+
+目标问题：请根据下述已知信息回答目标问题。根据上述已知信息，详细和专业的来回答用户的问题。如果能够检索到答案，需要保证回答完整。如果无法从中得到答案，请回答 “根据已知信息无法回答该问题，但根据理解，” 或 “没有提供足够的相关信息，但根据理解，”，然后根据理解生成答案，答案请使用中文。 
+###已知信息：
+{context} 
+###问题是：{question}。
+###答：
+
+"""
 
 
 # 缓存知识库数量,如果是ChatGLM2,ChatGLM2-int4,ChatGLM2-int8模型若检索效果不好可以调成’10’
 CACHED_VS_NUM = 10
 
 # 文本分句长度
-# SENTENCE_SIZE = 200
-SENTENCE_SIZE = 100
+SENTENCE_SIZE = 50
+# SENTENCE_SIZE = 100
 
 # 匹配后单段上下文长度
 CHUNK_SIZE = 300
 
 # 传入LLM的历史记录长度
-LLM_HISTORY_LEN = 3
+LLM_HISTORY_LEN = 1
 
 # 知识库检索时返回的匹配内容条数
 VECTOR_SEARCH_TOP_K = 5

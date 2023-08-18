@@ -18,7 +18,8 @@ from langchain.docstore.document import Document
 from functools import lru_cache
 from textsplitter.zh_title_enhance import zh_title_enhance
 from langchain.chains.base import Chain
-from langchain.text_splitter import RecursiveCharacterTextSplitter, TextSplitter, SpacyTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter, TextSplitter, SpacyTextSplitter, CharacterTextSplitter
+import re
 
 # patch HuggingFaceEmbeddings to make it hashable
 def _embeddings_hash(self):
@@ -68,16 +69,22 @@ def load_file(filepath, sentence_size=SENTENCE_SIZE, using_zh_title_enhance=ZH_T
     #     loader = TextLoader(filepath, autodetect_encoding=True)
     #     textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
     #     docs = loader.load_and_split(textsplitter)
-    # elif filepath.lower().endswith(".txt"):
-    #     loader = TextLoader(filepath, autodetect_encoding=True)
-    #     textsplitter = RecursiveCharacterTextSplitter(chunk_size=sentence_size, chunk_overlap=int(sentence_size*0.5))
-    #     docs = loader.load_and_split(textsplitter)
     
+    elif filepath.lower().endswith(".txt"):
+        print('split by RecursiveCharacterTextSplitter')
+        loader = TextLoader(filepath, autodetect_encoding=True)
+        # textsplitter = RecursiveCharacterTextSplitter(separators=['\n'])
+        textsplitter = CharacterTextSplitter(separator='\n', chunk_size=sentence_size, chunk_overlap=int(sentence_size*0.3))
+        docs = loader.load_and_split(textsplitter)
+        # import pdb;pdb.set_trace()
+        for _id, _doc in enumerate(docs):
+            docs[_id].page_content = re.sub('\n', ' ', _doc.page_content)
+            
     elif filepath.lower().endswith(".txt"):
         print('split by SpacyTextSplitter')
         loader = TextLoader(filepath, autodetect_encoding=True)
         # textsplitter = SpacyTextSplitter(pipeline='zh_core_web_sm', chunk_size=sentence_size, chunk_overlap=int(sentence_size*0.5))
-        textsplitter = SpacyTextSplitter(pipeline='zh_core_web_lg', chunk_size=sentence_size, chunk_overlap=int(sentence_size*0.5))
+        textsplitter = SpacyTextSplitter(pipeline='zh_core_web_lg', chunk_size=sentence_size, chunk_overlap=50)
         docs = loader.load_and_split(textsplitter)
     
     elif filepath.lower().endswith(".pdf"):
@@ -122,7 +129,8 @@ def write_check_file(filepath, docs):
 def generate_prompt(related_docs: List[str],
                     query: str,
                     prompt_template: str = PROMPT_TEMPLATE, ) -> str:
-    context = "\n".join([doc.page_content for doc in related_docs])
+    # context = "\n".join([doc.page_content for doc in related_docs])
+    context = "".join([doc.page_content for doc in related_docs])
     print('docs count : {}'.format(len(related_docs)))
     prompt = prompt_template.replace("{question}", query).replace("{context}", context)
     return prompt

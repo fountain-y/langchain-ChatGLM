@@ -32,6 +32,7 @@ META_INSTRUCTION = \
 # todo 在MOSSLLM类下，各模型的响应速度很慢，后续要检查一下原因
 class MOSSLLMChain(BaseAnswer, Chain, ABC):
     max_token: int = 2048
+    # max_token: int = 20480
     temperature: float = 0.7
     top_p = 0.8
     # history = []
@@ -41,10 +42,13 @@ class MOSSLLMChain(BaseAnswer, Chain, ABC):
     history_key: str = "history"  #: :meta private:
     prompt_key: str = "prompt"  #: :meta private:
     output_key: str = "answer_result_stream"  #: :meta private:
+    device: torch.device = "cpu"
 
     def __init__(self, checkPoint: LoaderCheckPoint = None):
         super().__init__()
         self.checkPoint = checkPoint
+        # import pdb;pdb.set_trace()
+        self.device = self.checkPoint.model.device
 
     @property
     def _chain_type(self) -> str:
@@ -96,15 +100,15 @@ class MOSSLLMChain(BaseAnswer, Chain, ABC):
             prompt_w_history += '<|Human|>: ' + prompt + '<eoh>'
 
         inputs = self.checkPoint.tokenizer(prompt_w_history, return_tensors="pt")
+        # import pdb;pdb.set_trace()
         with torch.no_grad():
             # max_length似乎可以设的小一些，而repetion_penalty应大一些，否则chatyuan,bloom等模型为满足max会重复输出
             #
             outputs = self.checkPoint.model.generate(
-                inputs.input_ids.cuda(),
-                attention_mask=inputs.attention_mask.cuda(),
-                max_length=self.max_token,
+                inputs.input_ids.to(self.device),
+                attention_mask=inputs.attention_mask.to(self.device),
+                max_new_tokens=self.max_token,
                 do_sample=True,
-                top_k=40,
                 top_p=self.top_p,
                 temperature=self.temperature,
                 repetition_penalty=1.02,
