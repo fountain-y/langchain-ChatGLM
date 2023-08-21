@@ -78,7 +78,8 @@ def load_file(filepath, sentence_size=SENTENCE_SIZE, using_zh_title_enhance=ZH_T
         docs = loader.load_and_split(textsplitter)
         # import pdb;pdb.set_trace()
         for _id, _doc in enumerate(docs):
-            docs[_id].page_content = re.sub('\n', ' ', _doc.page_content)
+            # docs[_id].page_content = re.sub('\n', ' ', _doc.page_content)
+            docs[_id].page_content = re.sub('###', '\n', _doc.page_content)
             
     elif filepath.lower().endswith(".txt"):
         print('split by SpacyTextSplitter')

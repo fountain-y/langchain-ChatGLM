@@ -80,7 +80,8 @@ class FastChatOpenAILLMChain(RemoteRpcModel, Chain, ABC):
     """Timeout for requests to OpenAI completion API. Default is 600 seconds."""
     max_retries: int = 6
     api_base_url: str = "http://localhost:8000/v1"
-    model_name: str = "chatglm-6b"
+    # model_name: str = "chatglm-6b"
+    model_name: str = "Baichuan-13B-Chat"
     max_token: int = 10000
     temperature: float = 0.01
     top_p = 0.9
@@ -206,6 +207,7 @@ class FastChatOpenAILLMChain(RemoteRpcModel, Chain, ABC):
             )
         msg = build_message_list(prompt, history=history)
 
+        # import pdb;pdb.set_trace()
         if streaming:
             params = {"stream": streaming,
                       "model": self.model_name,
